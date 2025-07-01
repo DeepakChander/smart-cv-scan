@@ -1,11 +1,15 @@
-
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, Target, Clock, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import CVAnalysisForm from "@/components/CVAnalysisForm";
+import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
   const handleStartAnalysis = () => {
-    window.open("https://toolsagentn8n.app.n8n.cloud/form/d84c1707-dcd6-4878-87f8-cf31cfaba276", "_blank");
+    setIsFormOpen(true);
   };
 
   const fadeInUp = {
@@ -277,6 +281,15 @@ const Index = () => {
           © 2024 SkillSync AI. Empowering careers with artificial intelligence.
         </p>
       </footer>
+
+      {/* Form Modal */}
+      <CVAnalysisForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+      />
+
+      {/* Toast Container */}
+      <Toaster />
     </div>
   );
 };
