@@ -1,8 +1,10 @@
+
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, Target, Clock, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import CVAnalysisForm from "@/components/CVAnalysisForm";
+import ThemeToggle from "@/components/ThemeToggle";
 import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
@@ -45,7 +47,10 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+      {/* Theme Toggle */}
+      <ThemeToggle />
+      
       {/* Hero Section */}
       <motion.div 
         className="relative overflow-hidden"
@@ -55,8 +60,8 @@ const Index = () => {
       >
         {/* Background Elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-400/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/10 dark:bg-blue-400/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-400/10 dark:bg-purple-400/5 rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
@@ -71,7 +76,7 @@ const Index = () => {
             {/* Main Headline */}
             <motion.h2 
               variants={fadeInUp}
-              className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight"
+              className="text-5xl md:text-7xl font-bold text-gray-900 dark:text-white mb-8 leading-tight transition-colors duration-300"
             >
               Instantly Analyze Your{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -82,7 +87,7 @@ const Index = () => {
             {/* Subheading */}
             <motion.p 
               variants={fadeInUp}
-              className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
+              className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed transition-colors duration-300"
             >
               Upload your CV to receive a personalized fit score and recommendations in seconds. 
               Powered by advanced AI to help you land your dream job.
@@ -106,7 +111,7 @@ const Index = () => {
             </motion.div>
 
             {/* Trust Indicators */}
-            <motion.div variants={fadeInUp} className="flex items-center justify-center space-x-8 text-sm text-gray-500">
+            <motion.div variants={fadeInUp} className="flex items-center justify-center space-x-8 text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">
               <div className="flex items-center">
                 <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
                 Free Analysis
@@ -126,7 +131,7 @@ const Index = () => {
 
       {/* Features Section */}
       <motion.div 
-        className="py-20 bg-white/50 backdrop-blur-sm"
+        className="py-20 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm transition-colors duration-300"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -140,10 +145,10 @@ const Index = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h3 className="text-4xl font-bold text-gray-900 mb-4">
+            <h3 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
               Why Choose SkillSync AI?
             </h3>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto transition-colors duration-300">
               Get comprehensive insights into your CV's strengths and areas for improvement
             </p>
           </motion.div>
@@ -157,15 +162,15 @@ const Index = () => {
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 viewport={{ once: true }}
                 whileHover={{ y: -5 }}
-                className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20"
+                className="bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-white/20 dark:border-gray-600/20"
               >
-                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg mb-4">
+                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/50 dark:to-purple-900/50 rounded-lg mb-4 transition-colors duration-300">
                   {feature.icon}
                 </div>
-                <h4 className="text-xl font-semibold text-gray-900 mb-2">
+                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
                   {feature.title}
                 </h4>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed transition-colors duration-300">
                   {feature.description}
                 </p>
               </motion.div>
@@ -176,7 +181,7 @@ const Index = () => {
 
       {/* How It Works Section */}
       <motion.div 
-        className="py-20"
+        className="py-20 transition-colors duration-300"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -190,10 +195,10 @@ const Index = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h3 className="text-4xl font-bold text-gray-900 mb-4">
+            <h3 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
               How It Works
             </h3>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 dark:text-gray-300 transition-colors duration-300">
               Get started in just 3 simple steps
             </p>
           </motion.div>
@@ -215,10 +220,10 @@ const Index = () => {
                 <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-2xl font-bold rounded-full mx-auto mb-4">
                   {item.step}
                 </div>
-                <h4 className="text-xl font-semibold text-gray-900 mb-2">
+                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
                   {item.title}
                 </h4>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
                   {item.description}
                 </p>
               </motion.div>
@@ -229,7 +234,7 @@ const Index = () => {
 
       {/* Final CTA Section */}
       <motion.div 
-        className="py-20 bg-gradient-to-r from-blue-600 to-purple-600"
+        className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-700 transition-colors duration-300"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -250,7 +255,7 @@ const Index = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
-            className="text-xl text-blue-100 mb-8"
+            className="text-xl text-blue-100 dark:text-blue-200 mb-8 transition-colors duration-300"
           >
             Join thousands of job seekers who have improved their chances with SkillSync AI
           </motion.p>
@@ -276,8 +281,8 @@ const Index = () => {
       </motion.div>
 
       {/* Footer */}
-      <footer className="py-8 bg-gray-900 text-center">
-        <p className="text-gray-400">
+      <footer className="py-8 bg-gray-900 dark:bg-gray-950 text-center transition-colors duration-300">
+        <p className="text-gray-400 dark:text-gray-500 transition-colors duration-300">
           © 2024 SkillSync AI. Empowering careers with artificial intelligence.
         </p>
       </footer>
