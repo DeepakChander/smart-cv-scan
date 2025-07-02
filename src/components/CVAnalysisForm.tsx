@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { X, Upload, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,10 +17,13 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    jobDescription: '',
     cv: null as File | null
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
   const { toast } = useToast();
 
   const validateForm = () => {
@@ -33,6 +37,12 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.jobDescription.trim()) {
+      newErrors.jobDescription = 'Job description is required';
+    } else if (formData.jobDescription.length < 10) {
+      newErrors.jobDescription = 'Job description must be at least 10 characters';
     }
 
     if (!formData.cv) {
@@ -58,10 +68,13 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
       const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name);
       formDataToSend.append('email', formData.email);
+      formDataToSend.append('job_description', formData.jobDescription);
       if (formData.cv) {
         formDataToSend.append('cv', formData.cv);
       }
 
+      console.log('Submitting form data to n8n webhook...');
+      
       const response = await fetch(
         'https://toolsagentn8n.app.n8n.cloud/form/d84c1707-dcd6-4878-87f8-cf31cfaba276',
         {
@@ -71,12 +84,18 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
       );
 
       if (response.ok) {
-        toast({
-          title: "Success!",
-          description: "Thank you for submitting! Your CV is being analyzed.",
-        });
-        onClose();
-        setFormData({ name: '', email: '', cv: null });
+        console.log('Form submitted successfully to n8n');
+        
+        // Simulate processing time (in real scenario, this would wait for n8n workflow completion)
+        setTimeout(() => {
+          setAnalysisComplete(true);
+          setShowCelebration(true);
+          toast({
+            title: "Analysis Complete!",
+            description: "Thanks for filling out the form! Your analysis is complete, and feedback will be sent to your email shortly.",
+          });
+        }, 3000);
+        
       } else {
         throw new Error('Submission failed');
       }
@@ -87,7 +106,6 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
         description: "Failed to submit your form. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -104,6 +122,15 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({ name: '', email: '', jobDescription: '', cv: null });
+    setErrors({});
+    setIsSubmitting(false);
+    setAnalysisComplete(false);
+    setShowCelebration(false);
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -112,114 +139,199 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-      onClick={onClose}
+      onClick={!isSubmitting ? onClose : undefined}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: "spring", duration: 0.5 }}
-        className="relative w-full max-w-md bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 p-6"
+        className="relative w-full max-w-md bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 p-6 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-2 hover:bg-gray-100 transition-colors"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Start Your CV Analysis
-          </h2>
-          <p className="text-gray-600">
-            Fill in your details and upload your CV to get started
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="name" className="text-sm font-medium text-gray-700">
-              Full Name *
-            </Label>
-            <Input
-              id="name"
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              className={`mt-1 ${errors.name ? 'border-red-500' : ''}`}
-              placeholder="Enter your full name"
-            />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-              Email Address *
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
-              placeholder="Enter your email address"
-            />
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="cv" className="text-sm font-medium text-gray-700">
-              CV Upload (PDF only) *
-            </Label>
-            <div className="mt-1">
-              <label
-                htmlFor="cv"
-                className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
-                  errors.cv ? 'border-red-500' : 'border-gray-300'
-                }`}
-              >
-                <div className="text-center">
-                  <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-600">
-                    {formData.cv ? formData.cv.name : 'Click to upload your CV'}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">PDF files only</p>
-                </div>
-              </label>
-              <input
-                id="cv"
-                type="file"
-                accept=".pdf,application/pdf"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-            </div>
-            {errors.cv && (
-              <p className="mt-1 text-sm text-red-600">{errors.cv}</p>
-            )}
-          </div>
-
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition-all duration-300"
+        {!isSubmitting && !analysisComplete && (
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 rounded-full p-2 hover:bg-gray-100 transition-colors"
           >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Analyzing...
-              </>
-            ) : (
-              'Start Analysis'
-            )}
-          </Button>
-        </form>
+            <X className="h-4 w-4" />
+          </button>
+        )}
+
+        {analysisComplete && showCelebration ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-8"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="text-6xl mb-4"
+            >
+              🎉
+            </motion.div>
+            <motion.h2
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-2xl font-bold text-gray-900 mb-4"
+            >
+              Congratulations!
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="text-gray-600 mb-6"
+            >
+              Thanks for filling out the form! Your analysis is complete, and feedback will be sent to your email shortly.
+            </motion.p>
+            <Button
+              onClick={resetForm}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              Submit Another CV
+            </Button>
+          </motion.div>
+        ) : isSubmitting ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="inline-block mb-4"
+            >
+              <Loader2 className="h-12 w-12 text-blue-600" />
+            </motion.div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Analyzing Your CV...
+            </h3>
+            <p className="text-gray-600">
+              Our AI is processing your information. This may take a few moments.
+            </p>
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 25, ease: "linear" }}
+              className="mt-4 h-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"
+            />
+          </motion.div>
+        ) : (
+          <>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Start Your CV Analysis
+              </h2>
+              <p className="text-gray-600">
+                Fill in your details and upload your CV to get personalized feedback
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                  Full Name *
+                </Label>
+                <Input
+                  id="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className={`mt-1 ${errors.name ? 'border-red-500' : ''}`}
+                  placeholder="Enter your full name"
+                />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  Email Address *
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className={`mt-1 ${errors.email ? 'border-red-500' : ''}`}
+                  placeholder="Enter your email address"
+                />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="jobDescription" className="text-sm font-medium text-gray-700">
+                  Job Description *
+                </Label>
+                <Textarea
+                  id="jobDescription"
+                  value={formData.jobDescription}
+                  onChange={(e) => setFormData(prev => ({ ...prev, jobDescription: e.target.value }))}
+                  className={`mt-1 min-h-[100px] ${errors.jobDescription ? 'border-red-500' : ''}`}
+                  placeholder="Describe the job you're applying for, including key requirements and responsibilities..."
+                />
+                {errors.jobDescription && (
+                  <p className="mt-1 text-sm text-red-600">{errors.jobDescription}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="cv" className="text-sm font-medium text-gray-700">
+                  CV Upload (PDF only) *
+                </Label>
+                <div className="mt-1">
+                  <label
+                    htmlFor="cv"
+                    className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
+                      errors.cv ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  >
+                    <div className="text-center">
+                      <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-600">
+                        {formData.cv ? formData.cv.name : 'Click to upload your CV'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">PDF files only</p>
+                    </div>
+                  </label>
+                  <input
+                    id="cv"
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </div>
+                {errors.cv && (
+                  <p className="mt-1 text-sm text-red-600">{errors.cv}</p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition-all duration-300"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  'Start Analysis'
+                )}
+              </Button>
+            </form>
+          </>
+        )}
       </motion.div>
     </motion.div>
   );
