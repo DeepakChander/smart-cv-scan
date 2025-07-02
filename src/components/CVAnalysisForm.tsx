@@ -66,17 +66,23 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('job_description', formData.jobDescription);
+      formDataToSend.append('Name', formData.name);
+      formDataToSend.append('Email', formData.email);
+      formDataToSend.append('Job Description', formData.jobDescription);
       if (formData.cv) {
-        formDataToSend.append('cv', formData.cv);
+        formDataToSend.append('CV', formData.cv);
       }
 
       console.log('Submitting form data to n8n webhook...');
+      console.log('Form data:', {
+        name: formData.name,
+        email: formData.email,
+        jobDescription: formData.jobDescription,
+        cvFileName: formData.cv?.name
+      });
       
       const response = await fetch(
-        'https://toolsagentn8n.app.n8n.cloud/form/d84c1707-dcd6-4878-87f8-cf31cfaba276',
+        'https://toolsagentn8n.app.n8n.cloud/webhook/ded4e41a-9689-4e1e-b131-df47959f761d',
         {
           method: 'POST',
           body: formDataToSend,
@@ -86,7 +92,7 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
       if (response.ok) {
         console.log('Form submitted successfully to n8n');
         
-        // Simulate processing time (in real scenario, this would wait for n8n workflow completion)
+        // Simulate processing time for workflow completion
         setTimeout(() => {
           setAnalysisComplete(true);
           setShowCelebration(true);
@@ -97,13 +103,13 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
         }, 3000);
         
       } else {
-        throw new Error('Submission failed');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
       console.error('Form submission error:', error);
       toast({
         title: "Error",
-        description: "Failed to submit your form. Please try again.",
+        description: "Failed to submit your form. Please check all fields and try again.",
         variant: "destructive",
       });
       setIsSubmitting(false);
@@ -146,15 +152,15 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: "spring", duration: 0.5 }}
-        className="relative w-full max-w-md bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 p-6 max-h-[90vh] overflow-y-auto"
+        className="relative w-full max-w-md bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 dark:border-gray-600/20 p-6 max-h-[90vh] overflow-y-auto transition-colors duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {!isSubmitting && !analysisComplete && (
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 rounded-full p-2 hover:bg-gray-100 transition-colors"
+            className="absolute right-4 top-4 rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4 text-gray-600 dark:text-gray-300" />
           </button>
         )}
 
@@ -176,7 +182,7 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="text-2xl font-bold text-gray-900 mb-4"
+              className="text-2xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300"
             >
               Congratulations!
             </motion.h2>
@@ -184,7 +190,7 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="text-gray-600 mb-6"
+              className="text-gray-600 dark:text-gray-300 mb-6 transition-colors duration-300"
             >
               Thanks for filling out the form! Your analysis is complete, and feedback will be sent to your email shortly.
             </motion.p>
@@ -208,10 +214,10 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
             >
               <Loader2 className="h-12 w-12 text-blue-600" />
             </motion.div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
               Analyzing Your CV...
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
               Our AI is processing your information. This may take a few moments.
             </p>
             <motion.div
@@ -224,17 +230,17 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
         ) : (
           <>
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
                 Start Your CV Analysis
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300 transition-colors duration-300">
                 Fill in your details and upload your CV to get personalized feedback
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
                   Full Name *
                 </Label>
                 <Input
@@ -251,7 +257,7 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
               </div>
 
               <div>
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
                   Email Address *
                 </Label>
                 <Input
@@ -268,7 +274,7 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
               </div>
 
               <div>
-                <Label htmlFor="jobDescription" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="jobDescription" className="text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
                   Job Description *
                 </Label>
                 <Textarea
@@ -284,22 +290,22 @@ const CVAnalysisForm: React.FC<CVAnalysisFormProps> = ({ isOpen, onClose }) => {
               </div>
 
               <div>
-                <Label htmlFor="cv" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="cv" className="text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300">
                   CV Upload (PDF only) *
                 </Label>
                 <div className="mt-1">
                   <label
                     htmlFor="cv"
-                    className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
-                      errors.cv ? 'border-red-500' : 'border-gray-300'
+                    className={`flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                      errors.cv ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
                     <div className="text-center">
-                      <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                      <p className="text-sm text-gray-600">
+                      <Upload className="mx-auto h-8 w-8 text-gray-400 dark:text-gray-500 mb-2" />
+                      <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">
                         {formData.cv ? formData.cv.name : 'Click to upload your CV'}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">PDF files only</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-300">PDF files only</p>
                     </div>
                   </label>
                   <input
